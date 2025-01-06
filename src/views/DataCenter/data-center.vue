@@ -16,18 +16,17 @@
                             type="year"
                             clearable
                             placeholder="请选择年份"
+                            class="page-search-content__item"
                         />
                     </n-form-item>
 
                     <n-form-item label="月">
-                        <n-date-picker
+                        <n-select
                             v-model:value="searchParams.month"
-                            type="month"
+                            :options="monthOptions"
                             clearable
-                            format="y年 M月"
-                            year-format="y年"
-                            month-format="M月"
                             placeholder="请选择月份"
+                            class="page-search-content__item"
                         />
                     </n-form-item>
 
@@ -37,6 +36,7 @@
                             type="week"
                             clearable
                             placeholder="请选择周"
+                            class="page-search-content__item"
                         />
                     </n-form-item>
                 </n-form>
@@ -113,18 +113,20 @@
 
 <script setup>
 import {ref} from "vue";
-import {NForm, NFormItem, NDatePicker, NButton, NSpace, NIcon, NTabs, NTab, NTable} from "naive-ui";
+import {NForm, NFormItem, NDatePicker, NButton, NSpace, NIcon, NTabs, NTab, NTable, NSelect} from "naive-ui";
 import {RefreshOutline, SearchOutline} from "@vicons/ionicons5";
 
 const searchParams = ref(null);
 const tabs = ref([]);
 const table = ref([]);
+const monthOptions = ref([]);
 
 init();
 
 function init() {
     initSearchParams();
     initTabList();
+    initSearchOptions();
     getData();
 }
 
@@ -161,6 +163,14 @@ function initSearchParams() {
     };
 }
 
+function initSearchOptions() {
+    let months = [];
+    for (let i = 1; i < 13; i++) months.push(i);
+
+    monthOptions.value = months.map(month => ({ label: month + "月", value: month }));
+    console.log(monthOptions.value);
+}
+
 function initTabList() {
     tabs.value = [
         {
@@ -179,3 +189,8 @@ function initTabList() {
 }
 </script>
 
+<style lang="scss" scoped>
+.page-search-content__item {
+    width: 240px;
+}
+</style>

@@ -15,7 +15,7 @@ html, body {
 
 .app-container {
     width: 100%;
-    height: 100%;
+    height: 100vh;
 }
 
 .page-container {
@@ -62,16 +62,22 @@ html, body {
         align-items: center;
         flex-shrink: 0;
         width: 100%;
-        font-size: var(--root-font-size-default);
+        font-size: var(--root-font-size-medium);
         margin-bottom: var(--root-padding-default);
         &:before {
             content: "";
             display: inline-block;
             width: 4px;
             margin-right: 5px;
-            height: var(--root-padding-default);
+            height: var(--root-font-size-medium);
             background-color: var(--root-color);
             border-radius: 2px;
         }
+    }
+
+    .page-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: var(--root-padding-default);
     }
 }

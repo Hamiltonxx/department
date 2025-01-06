@@ -1,129 +1,174 @@
 <template>
     <div class="page-container">
-        <div class="page-search">
-            <div class="page-title">查询条件</div>
-
-            <div class="page-search-content">
-                <n-form
-                    :model="searchParams"
-                    inline
-                    label-placement="left"
-                    :show-feedback="false"
+        <!--内容-->
+        <div class="page-content">
+            <div class="page-title">
+                数据列表
+                <n-button
+                    class="uploader-btn"
+                    type="primary"
+                    @click="handleShowUploader"
                 >
-                    <n-form-item label="选择时间">
-                        <n-date-picker
-                            type="daterange"
-                            clearable
-                            start-placeholder="开始时间"
-                            end-placeholder="结束时间"
-                            separator="至"
-                        />
-                    </n-form-item>
-                </n-form>
+                    <template #icon>
+                        <n-icon>
+                            <cloud-upload/>
+                        </n-icon>
+                    </template>
+                    上传文件
+                </n-button>
+            </div>
 
-                <n-space class="page-search__button">
-                    <n-button
-                        @click="handleReset"
-                    >
-                        <template #icon>
-                            <n-icon>
-                                <RefreshOutline/>
-                            </n-icon>
-                        </template>
-                        清空
-                    </n-button>
+            <n-data-table
+                :columns="columns"
+                :data="table.data"
+                :max-height="max_height"
+                :loading="table.loading"
+            />
 
-                    <n-button
-                        type="primary"
-                        @click="handleSearch"
-                    >
-                        <template #icon>
-                            <n-icon>
-                                <SearchOutline/>
-                            </n-icon>
-                        </template>
-                        搜索
-                    </n-button>
-                </n-space>
+            <div class="page-footer">
+                <n-pagination
+                    v-model:page="table.current"
+                    :page-count="table.total"
+                    @update:page="handleChangePage"
+                />
             </div>
         </div>
 
-        <div class="page-content">
-            <div class="page-title">数据列表</div>
-
-            <n-table :single-line="false" style="margin-top: var(--root-padding-default)">
-                <thead>
-                    <tr>
-                        <th>项目名称</th>
-                        <th>全房通</th>
-                        <th>贝壳</th>
-                        <th>POS机</th>
-                        <th>银行转账</th>
-                        <th>现金=现金-优惠</th>
-                        <th>操作</th>
-                        <th>凭证状态</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="(item, index) in table"
-                        :key="index"
-                    >
-                        <td>{{ item.project }}</td>
-                        <td><custom-upload-file :obj="item.q" /></td>
-                        <td><custom-upload-file :obj="item.b" /></td>
-                        <td><custom-upload-file :obj="item.p" /></td>
-                        <td><custom-upload-file :obj="item.y" /></td>
-                        <td><custom-upload-file :obj="item.x" /></td>
-                        <td>分析</td>
-                        <td>{{ item.state }}</td>
-                    </tr>
-                </tbody>
-            </n-table>
-        </div>
+        <!--上传弹框-->
+        <custom-upload-file
+            v-model:value="showUploader"
+            @success="handleUploadSuccess"
+        />
     </div>
 </template>
 
 <script setup>
-import {ref} from "vue";
-
-import {NForm, NFormItem, NDatePicker, NSpace, NIcon, NButton, NTable} from "naive-ui";
-import {RefreshOutline, SearchOutline} from "@vicons/ionicons5";
+import {ref, onBeforeMount, onMounted} from "vue";
+import {NIcon, NButton, NDataTable, NPagination} from "naive-ui";
+import {CloudUpload} from "@vicons/ionicons5";
 import CustomUploadFile from "@/components/upload-file";
+import {getData as getDataApi} from "@/api/check-accounts";
+import { formatDate } from "@/lib/date-transformer";
 
-const searchParams = ref(null);
-const table = ref([]);
+onBeforeMount(() => {
+    init()
+});
 
-init();
+onMounted(() => {
+   getMaxHeight();
+});
 
-function handleReset() {
-    initSearchParams();
-    handleSearch();
+// 显示上传组件
+const showUploader = ref(false);
+
+function handleShowUploader() {
+    showUploader.value = true;
 }
 
-function handleSearch() {
-
-}
-
+// 初始化
 function init() {
-    initSearchParams();
     getData();
 }
 
-function getData() {
-    table.value = [
-        { project: "龙曹路", q: null, b: null, p: null, y: null, x: null, state: "未生成" },
-        { project: "林甜路", q: null, b: null, p: null, y: null, x: null, state: "未生成" },
-        { project: "四平路", q: null, b: null, p: null, y: null, x: null, state: "未生成" },
-        { project: "桂林路", q: null, b: null, p: null, y: null, x: null, state: "未生成" },
-        { project: "南京路", q: null, b: null, p: null, y: null, x: null, state: "未生成" },
-        { project: "杭州路", q: null, b: null, p: null, y: null, x: null, state: "未生成" },
-    ];
+const columns = [
+    {
+        title: "序号",
+        key: "no",
+        maxWidth: 60,
+    },
+    {
+        title: "流水号",
+        key: "serialno",
+    },
+    {
+        title: "门店名称",
+        key: "shop",
+    },
+    {
+        title: "类别",
+        key: "category",
+    },
+    {
+        title: "性质",
+        key: "tag",
+    },
+    {
+        title: "实际金额",
+        key: "actual_amount",
+    },
+    {
+        title: "承租人",
+        key: "renter",
+    },
+    {
+        title: "交易时间",
+        key: "paytime",
+        render: item => {
+            return formatDate(item.paytime);
+        }
+    }
+];
+
+// 表格相关
+const table = ref({
+    current: 1,
+    size: 100,
+    loading: false,
+    data: [],
+    total: 0,
+});
+
+// 获取数据
+async function getData() {
+    const {current, size} = table.value;
+
+    table.value.loading = true;
+    const res = await getDataApi({current, size});
+    table.value.loading = false;
+
+    res.data.forEach((item, index) => {
+        item.no = index + 1;
+    });
+
+    table.value.data = res.data;
+    table.value.total = Math.ceil(res.total / table.value.size);
 }
 
-function initSearchParams() {
-    searchParams.value = {
-        date: null,
-    };
+function handleChangePage(page) {
+    table.value.current = page;
+
+    getData();
+}
+
+// 上传成功
+function handleUploadSuccess() {
+    table.value.current = 1;
+
+    getData();
+}
+
+const max_height = ref(0);
+function getMaxHeight() {
+    let window_height = document.documentElement.clientHeight;
+
+    window_height = window_height - 60 - 32 - 184;
+
+    max_height.value = window_height;
 }
 </script>
+
+<style lang="scss" scoped>
+.page-content {
+    margin-top: 0;
+
+    .page-title {
+        position: relative;
+
+        .uploader-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+    }
+}
+</style>

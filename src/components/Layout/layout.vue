@@ -2,7 +2,7 @@
     <div class="layout app-container">
         <div class="layout-header">
             <div class="layout-header-system-name">
-<!--                乐课力财务中台-->
+               乐课力财务中台
             </div>
 
             <div class="layout-header-actions">
@@ -169,10 +169,10 @@ function handleLogout() {
     .layout-content {
         display: flex;
         width: 100%;
-        height: 100%;
         padding: var(--root-padding-default);
         padding-bottom: 0;
         box-sizing: border-box;
+        background-color: #f2f3f4;
     }
 }
 </style>
