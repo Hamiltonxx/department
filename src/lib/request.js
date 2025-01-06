@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    baseURL: 'https://dc.lookingedu.com/api/',
+    baseURL: 'https://dc.lookingedu.com:9000',
     timeout: 600 * 1000,
 });
 
