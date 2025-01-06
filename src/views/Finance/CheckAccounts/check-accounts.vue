@@ -97,7 +97,7 @@ const columns = [
         key: "category",
     },
     {
-        title: "性质",
+        title: "标记",
         key: "tag",
     },
     {
