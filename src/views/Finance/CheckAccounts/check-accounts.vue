@@ -85,6 +85,14 @@ const columns = [
         key: "shop",
     },
     {
+        title: "楼栋",
+        key: "building"
+    },
+    {
+        title: "门牌号",
+        key: "doorno",
+    },
+    {
         title: "类别",
         key: "category",
     },
@@ -104,7 +112,7 @@ const columns = [
         title: "交易时间",
         key: "paytime",
         render: item => {
-            return formatDate(item.paytime);
+            return formatDate(item.paytime, 'datetime');
         }
     }
 ];
