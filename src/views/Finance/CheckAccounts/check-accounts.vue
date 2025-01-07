@@ -74,11 +74,17 @@ const columns = [
     {
         title: "序号",
         key: "no",
-        maxWidth: 60,
+        width: 60,
+    },
+    {
+        title: "来源",
+        key: "source",
+        width: 100,
     },
     {
         title: "流水号",
         key: "serialno",
+        width: 200,
     },
     {
         title: "门店名称",
@@ -113,7 +119,8 @@ const columns = [
         key: "paytime",
         render: item => {
             return formatDate(item.paytime, 'datetime');
-        }
+        },
+        width: 200,
     }
 ];
 
@@ -156,12 +163,16 @@ function handleUploadSuccess() {
 }
 
 const max_height = ref(0);
+const max_width = ref(0);
 function getMaxHeight() {
     let window_height = document.documentElement.clientHeight;
+    let window_width = document.documentElement.clientWidth;
 
     window_height = window_height - 60 - 32 - 184;
+    window_width = window_width - 250 - 32 - 32;
 
     max_height.value = window_height;
+    max_width.value = window_width;
 }
 </script>
 
