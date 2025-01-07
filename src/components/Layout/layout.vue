@@ -65,6 +65,11 @@ const menuOption = ref([
                 icon: renderIcon(RecordingOutline),
             },
             {
+                label: "分析结果",
+                key: "Result",
+                icon: renderIcon(StatsChartOutline),
+            },
+            {
                 label: "匹配记录",
                 key: "MatchRecords",
                 icon: renderIcon(DocumentTextOutline),

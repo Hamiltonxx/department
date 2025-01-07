@@ -37,6 +37,11 @@ const router = createRouter({
           path: "proof-records",
           name: "ProofRecords",
           component: () => import("@/views/Finance/ProofRecords"),
+        },
+        {
+          path: "result",
+          name: "Result",
+          component: () => import("@/views/Finance/Result"),
         }
       ],
     }

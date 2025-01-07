@@ -115,6 +115,7 @@
 import {ref} from "vue";
 import {NForm, NFormItem, NDatePicker, NButton, NSpace, NIcon, NTabs, NTab, NTable, NSelect} from "naive-ui";
 import {RefreshOutline, SearchOutline} from "@vicons/ionicons5";
+import { getShopData } from "@/api/data-center";
 
 const searchParams = ref(null);
 const tabs = ref([]);
@@ -144,7 +145,10 @@ function handleSelectTab(value) {
     console.log(value);
 }
 
-function getData() {
+
+const currentTab = ref();
+async function getData() {
+
     table.value = [
         { project: "定金", prev: 12, month: 2, year: 2024 },
         { project: "押金", prev: 7, month: 2, year: 2024 },
@@ -155,10 +159,24 @@ function getData() {
     ];
 }
 
+function getYear(year) {
+    if (year) return new Date(year).getFullYear();
+
+    return new Date().getFullYear();
+}
+
+function getMonth(month) {
+    if (month) return new Date(month).getMonth() + 1;
+
+    return new Date().getMonth() + 1;
+}
+
 function initSearchParams() {
+    const date = new Date();
+
     searchParams.value = {
         year: null,
-        month: null,
+        month: date.getMonth() + 1,
         week: null,
     };
 }
