@@ -118,6 +118,8 @@ function handleReset() {
  */
 function handleSearch() {
     initShopData();
+    initTableCount();
+    initTableData();
 }
 
 /**
