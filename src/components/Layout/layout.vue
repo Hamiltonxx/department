@@ -114,7 +114,7 @@ function initUserInfo() {
         router.replace({ name: "Login" });
     }
 
-    if (!info) router.replace({ name: "Login" });
+    if (!info) return router.replace({ name: "Login" });
     
     switch (info.role) {
         case "admin":
