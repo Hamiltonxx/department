@@ -115,7 +115,6 @@
 import {ref} from "vue";
 import {NForm, NFormItem, NDatePicker, NButton, NSpace, NIcon, NTabs, NTab, NTable, NSelect} from "naive-ui";
 import {RefreshOutline, SearchOutline} from "@vicons/ionicons5";
-import { getShopData } from "@/api/data-center";
 
 const searchParams = ref(null);
 const tabs = ref([]);

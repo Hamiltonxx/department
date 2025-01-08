@@ -231,7 +231,6 @@ const max_height = ref(0);
 function getMaxHeight() {
     let window_height = document.documentElement.clientHeight;
     window_height = window_height - 60 - 32 - 334;
-    console.log(window_height);
     max_height.value = window_height;
 }
 
