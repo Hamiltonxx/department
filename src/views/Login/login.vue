@@ -111,7 +111,7 @@ async function handleSubmit() {
     justify-content: center;
     align-items: center;
     position: relative;
-    background: url(../../assets/images/login.jpeg) no-repeat;
+    background: url(../../assets/images/login.jpg) no-repeat;
     background-size: cover;
     background-position: center center;
     .mask {
@@ -120,7 +120,6 @@ async function handleSubmit() {
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,.3);
     }
     .login-area {
         position: relative;

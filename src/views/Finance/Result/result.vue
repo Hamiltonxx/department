@@ -97,7 +97,7 @@ onMounted(() => {
 
 const columns = [
     { title: "序号", key: "no", width: 60, },
-    { title: "项目", key: "category", },   
+    { title: "流水明细", key: "category", },   
     { title: "收入", key: "income", },   
     { title: "支出", key: "expense", },   
     { title: "总计", key: "total", },   

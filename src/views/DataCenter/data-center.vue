@@ -4,7 +4,7 @@
             <div class="page-title">查询条件</div>
 
             <div class="page-search-content">
-                <n-form
+                <!-- <n-form
                     :model="searchParams"
                     inline
                     label-placement="left"
@@ -36,6 +36,22 @@
                             type="week"
                             clearable
                             placeholder="请选择周"
+                            class="page-search-content__item"
+                        />
+                    </n-form-item>
+                </n-form> -->
+
+                <n-form
+                    :model="searchParams"
+                    inline
+                    label-placement="left"
+                    :show-feedback="false"
+                >
+                    <n-form-item label="时间选择">
+                        <n-date-picker
+                            v-model:value="searchParams.date"
+                            type="daterange"
+                            clearable
                             class="page-search-content__item"
                         />
                     </n-form-item>
@@ -73,11 +89,11 @@
 
             <n-tabs
                 type="line"
-                :default-value="tabs[0].value"
+                :default-value="shopList[0].value"
                 @update:value="handleSelectTab"
             >
                 <n-tab
-                    v-for="(item, index) in tabs"
+                    v-for="(item, index) in shopList"
                     :key="index"
                     :name="item.value"
                 >
@@ -85,47 +101,51 @@
                 </n-tab>
             </n-tabs>
 
-            <n-table :single-line="false" style="margin-top: var(--root-padding-default)">
-                <thead>
-                    <tr>
-                        <th>项目</th>
-                        <th>上月同期</th>
-                        <th>月</th>
-                        <th>年</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="(item, index) in table"
-                        :key="index"
-                    >
-                        <td style="width: 25%">{{ item.project }}</td>
-                        <td style="width: 25%">{{ item.prev }}</td>
-                        <td style="width: 25%">{{ item.month }}</td>
-                        <td style="width: 25%">{{ item.year }}</td>
-                    </tr>
-                </tbody>
-            </n-table>
+            <n-data-table 
+                :columns="columns"
+                :data="table.data"
+                :row-key="rowKey"
+                :max-height="max_height"
+                :row-class-name="rowClassName"
+                :loading="table.loading"
+            />
 
         </div>
     </div>
 </template>
 
 <script setup>
-import {ref} from "vue";
-import {NForm, NFormItem, NDatePicker, NButton, NSpace, NIcon, NTabs, NTab, NTable, NSelect} from "naive-ui";
+import {ref, onBeforeMount, onMounted} from "vue";
+import {NForm, NFormItem, NDatePicker, NButton, NSpace, NIcon, NTabs, NTab, NDataTable, c} from "naive-ui";
 import {RefreshOutline, SearchOutline} from "@vicons/ionicons5";
+import { getShop } from "@/api/result";
+import { getShopDataDetail } from "@/api/data-center";
 
+let shopList = ref([{ label: "全部", value: "全部" }]);
 const searchParams = ref(null);
-const tabs = ref([]);
-const table = ref([]);
 const monthOptions = ref([]);
+const activeTab = ref("全部");
 
-init();
+onBeforeMount(() => {
+    init();
+});
+
+onMounted(() => {
+    getMaxHeight();
+});
+
+const columns = [
+    { title: "序号", key: "no", width: 100, },
+    { title: "收支总类", key: "category_group", },
+    { title: "流水明细", key: "category", },   
+    { title: "收入", key: "income", },   
+    { title: "支出", key: "expense", },   
+    { title: "总计", key: "total", },   
+];
 
 function init() {
     initSearchParams();
-    initTabList();
+    initShopData();
     initSearchOptions();
     getData();
 }
@@ -141,21 +161,65 @@ function handleSearch() {
 }
 
 function handleSelectTab(value) {
-    console.log(value);
+    activeTab.value = value;
+    getData();
 }
 
+function rowKey(row) {
+    return row.no;
+}
 
-const currentTab = ref();
+function rowClassName(row) {
+    return row.no ? "" : "row-children";
+}
+
+/**
+ * 初始化门店数据
+ */
+ const table = ref({
+    loading: false,
+    data: [],
+});
 async function getData() {
+    const params = {
+        ...getParams(),
+        shop: activeTab.value === "全部" ? null : activeTab.value,
+    };
 
-    table.value = [
-        { project: "定金", prev: 12, month: 2, year: 2024 },
-        { project: "押金", prev: 7, month: 2, year: 2024 },
-        { project: "房租收入", prev: 3, month: 2, year: 2024 },
-        { project: "能源费", prev: 2, month: 2, year: 2024 },
-        { project: "维保费", prev: 8, month: 2, year: 2024 },
-        { project: "违约金", prev: 5, month: 2, year: 2024 },
-    ];
+    table.value.loading = true;
+    const res = await getShopDataDetail(params);
+    table.value.loading = false;
+
+    let result = {};
+
+    res.forEach(item => result[item.category_group] = { children: [], total: 0, income: 0, expense: 0 });
+
+    res.forEach(item => {
+        Object.keys(result).forEach(key => {
+            if (key === item.category_group) {
+                result[key].children.push(item);
+                result[key].total += item.total;
+                result[key].income += item.income;
+                result[key].expense += item.expense;
+            }
+        });
+    });
+
+    let r = [];
+
+    Object.keys(result).forEach((key, index) => {
+        r.push({
+            no: index + 1,
+            category_group: key,
+            category: "",
+            income: result[key].income.toFixed(2),
+            expense: result[key].expense.toFixed(2),
+            total: result[key].total.toFixed(2),
+            children: result[key].children,
+        });
+    });
+
+    table.value.data = r;
 }
 
 function getYear(year) {
@@ -171,13 +235,28 @@ function getMonth(month) {
 }
 
 function initSearchParams() {
-    const date = new Date();
+    const month = new Date().getMonth() + 1;
+    let starttime = new Date(new Date().getFullYear(), month - 1, 1), 
+    endtime;
+
+    if ([1,3,5,7,8,10,12].includes(month)) {
+        endtime = new Date(new Date().getFullYear(), month - 1, 31);
+    } else if (month === 2) {
+        endtime = new Date(new Date().getFullYear(), month - 1, 28);
+    } else {
+        endtime = new Date(new Date().getFullYear(), month - 1, 30);
+    }
 
     searchParams.value = {
-        year: null,
-        month: date.getMonth() + 1,
-        week: null,
+        date: [new Date(starttime), new Date(endtime)],
     };
+    // const date = new Date();
+
+    // searchParams.value = {
+    //     year: null,
+    //     month: date.getMonth() + 1,
+    //     week: null,
+    // };
 }
 
 function initSearchOptions() {
@@ -185,29 +264,45 @@ function initSearchOptions() {
     for (let i = 1; i < 13; i++) months.push(i);
 
     monthOptions.value = months.map(month => ({ label: month + "月", value: month }));
-    console.log(monthOptions.value);
 }
 
-function initTabList() {
-    tabs.value = [
-        {
-            label: "全部",
-            value: 0,
-        },
-        {
-            label: "漕河泾项目",
-            value: 1,
-        },
-        {
-            label: "田林路项目",
-            value: 2,
-        }
-    ];
+async function initShopData() {
+    shopList.value = [{ label: "全部", value: "全部" }];
+
+    const params = getParams();
+
+    const res = await getShop(params);
+
+    res.forEach(item => shopList.value.push({ label: item, value: item }));
+}
+
+function getParams() {
+    return {
+        startdate: formatDate(searchParams.value.date[0]) + ' 00:00:00',
+        enddate: formatDate(searchParams.value.date[1]) + ' 23:59:59',
+    };
+}
+
+// 格式化日期
+function formatDate(dateNumber) {
+    const date = new Date(dateNumber);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+}
+
+const max_height = ref(0);
+function getMaxHeight() {
+    let window_height = document.documentElement.clientHeight;
+    window_height = window_height - 60 - 32 - 334;
+    max_height.value = window_height;
 }
 </script>
 
 <style lang="scss" scoped>
-.page-search-content__item {
-    width: 240px;
+:deep(.row-children .n-data-table-td) {
+    background-color: #F8FBFC !important;
 }
 </style>

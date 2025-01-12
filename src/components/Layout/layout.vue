@@ -2,7 +2,7 @@
     <div class="layout app-container">
         <div class="layout-header">
             <div class="layout-header-system-name">
-                乐课力财务中台
+                乐课力数据中心
             </div>
 
             <div class="layout-header-actions">
@@ -115,7 +115,7 @@ function initUserInfo() {
     }
 
     if (!info) return router.replace({ name: "Login" });
-    
+
     switch (info.role) {
         case "admin":
             menuOption.value = [dataCenter.value, finance.value];
