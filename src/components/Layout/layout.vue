@@ -55,7 +55,7 @@ const finance = ref({
     icon: renderIcon(StatsChartOutline),
     children: [
         {
-            label: "财务对账",
+            label: "数据查询",
             key: "CheckAccounts",
             icon: renderIcon(RecordingOutline),
         },
