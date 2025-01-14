@@ -38,7 +38,11 @@ html, body {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            .page-search-content__item {
+                width: 300px;
+            }
         }
+        
     }
 
     .page-content {

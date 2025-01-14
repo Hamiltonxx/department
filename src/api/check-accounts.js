@@ -1,7 +1,7 @@
-import { GET } from "@/lib/request";
+import { POST } from "@/lib/request";
 
-export function getData({ current, size }) {
+export function getData({ current, size }, data) {
     const url = `/invoice?pageno=${ current }&limit=${ size }`;
 
-    return GET(url);
+    return POST(url, data);
 }

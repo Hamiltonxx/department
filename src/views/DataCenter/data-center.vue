@@ -4,43 +4,6 @@
             <div class="page-title">查询条件</div>
 
             <div class="page-search-content">
-                <!-- <n-form
-                    :model="searchParams"
-                    inline
-                    label-placement="left"
-                    :show-feedback="false"
-                >
-                    <n-form-item label="年">
-                        <n-date-picker
-                            v-model:value="searchParams.year"
-                            type="year"
-                            clearable
-                            placeholder="请选择年份"
-                            class="page-search-content__item"
-                        />
-                    </n-form-item>
-
-                    <n-form-item label="月">
-                        <n-select
-                            v-model:value="searchParams.month"
-                            :options="monthOptions"
-                            clearable
-                            placeholder="请选择月份"
-                            class="page-search-content__item"
-                        />
-                    </n-form-item>
-
-                    <n-form-item label="周">
-                        <n-date-picker
-                            v-model:value="searchParams.week"
-                            type="week"
-                            clearable
-                            placeholder="请选择周"
-                            class="page-search-content__item"
-                        />
-                    </n-form-item>
-                </n-form> -->
-
                 <n-form
                     :model="searchParams"
                     inline
@@ -250,13 +213,6 @@ function initSearchParams() {
     searchParams.value = {
         date: [new Date(starttime), new Date(endtime)],
     };
-    // const date = new Date();
-
-    // searchParams.value = {
-    //     year: null,
-    //     month: date.getMonth() + 1,
-    //     week: null,
-    // };
 }
 
 function initSearchOptions() {

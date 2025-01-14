@@ -1,7 +1,70 @@
 <template>
     <div class="page-container">
+        <!-- 条件 -->
+        <div class="page-search">
+            <div class="page-title">查询条件</div>
+
+            <div class="page-search-content">
+                <n-form
+                    :model="searchParams"
+                    inline
+                    label-placement="left"
+                    :show-feedback="false"
+                >
+                    <n-form-item label="时间选择">
+                        <n-date-picker
+                            v-model:value="searchParams.date"
+                            type="daterange"
+                            clearable
+                            class="page-search-content__item"
+                        />
+                    </n-form-item>
+                    <n-form-item label="来源">
+                        <n-select 
+                            v-model:value="searchParams.source" 
+                            :options="sourceOptions" 
+                            class="page-search-content__item"
+                        />
+                    </n-form-item>
+                    <n-form-item label="门店名称">
+                        <n-input
+                            v-model:value="searchParams.shop"
+                            placeholder="请输入门店名称"
+                            clearable
+                            class="page-search-content__item"
+                        />
+                    </n-form-item>
+                </n-form>
+
+                <n-space class="page-search__button">
+                    <n-button
+                        @click="handleReset"
+                    >
+                        <template #icon>
+                            <n-icon>
+                                <RefreshOutline/>
+                            </n-icon>
+                        </template>
+                        清空
+                    </n-button>
+
+                    <n-button
+                        type="primary"
+                        @click="handleSearch"
+                    >
+                        <template #icon>
+                            <n-icon>
+                                <SearchOutline/>
+                            </n-icon>
+                        </template>
+                        搜索
+                    </n-button>
+                </n-space>
+            </div>
+        </div>
+
         <!--内容-->
-        <div class="page-content">
+        <div class="page-content" style="margin-top: 16px;">
             <div class="page-title">
                 数据列表
                 <n-button
@@ -44,8 +107,8 @@
 
 <script setup>
 import {ref, onBeforeMount, onMounted} from "vue";
-import {NIcon, NButton, NDataTable, NPagination} from "naive-ui";
-import {CloudUpload} from "@vicons/ionicons5";
+import {NSpace, NInput, NForm, NFormItem, NDatePicker, NSelect, NIcon, NButton, NDataTable, NPagination} from "naive-ui";
+import {CloudUpload, RefreshOutline, SearchOutline} from "@vicons/ionicons5";
 import CustomUploadFile from "@/components/upload-file";
 import {getData as getDataApi} from "@/api/check-accounts";
 import { formatDate } from "@/lib/date-transformer";
@@ -58,6 +121,13 @@ onMounted(() => {
    getMaxHeight();
 });
 
+const searchParams = ref(null);
+const sourceOptions = ref([
+    { label: "全部", value: "全部", },
+    { label: "全房通", value: "全房通" },
+    { label: "贝壳", value: "贝壳" },
+]);
+
 // 显示上传组件
 const showUploader = ref(false);
 
@@ -67,8 +137,22 @@ function handleShowUploader() {
 
 // 初始化
 function init() {
+    initSearchParams();
     getData();
 }
+
+
+function handleReset() {
+    table.value.current = 1;
+    initSearchParams();
+
+    handleSearch();
+}
+
+function handleSearch() {
+    getData();
+}
+
 
 const columns = [
     {
@@ -136,9 +220,21 @@ const table = ref({
 // 获取数据
 async function getData() {
     const {current, size} = table.value;
+    const { date, shop, source } = searchParams.value;
+
+    let params = {
+        shop,
+        source: source === "全部" ? null : source, 
+    };
+    console.log(date);
+    if (date) {
+
+        params.startdate = formatDate(new Date(date[0])) + ' 00:00:00';
+        params.enddate = formatDate(new Date(date[1])) + ' 23:59:59';
+    }
 
     table.value.loading = true;
-    const res = await getDataApi({current, size});
+    const res = await getDataApi({current, size}, params);
     table.value.loading = false;
 
     res.data.forEach((item, index) => {
@@ -165,10 +261,20 @@ function handleUploadSuccess() {
 const max_height = ref(0);
 function getMaxHeight() {
     let window_height = document.documentElement.clientHeight;
-    window_height = window_height - 60 - 32 - 184;
+    window_height = window_height - 60 - 32 - 284;
 
     max_height.value = window_height;
 }
+
+// 初始化查询条件
+function initSearchParams() {
+    searchParams.value = {
+        date: null,
+        shop: null,
+        source: "全部",
+    };
+}
+
 </script>
 
 <style lang="scss" scoped>
