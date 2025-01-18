@@ -10,6 +10,7 @@
                     inline
                     label-placement="left"
                     :show-feedback="false"
+                    style="flex-wrap: wrap;gap: 16px"
                 >
                     <n-form-item label="时间选择">
                         <n-date-picker
@@ -30,6 +31,23 @@
                         <n-input
                             v-model:value="searchParams.shop"
                             placeholder="请输入门店名称"
+                            clearable
+                            class="page-search-content__item"
+                        />
+                    </n-form-item>
+                    <br />
+                    <n-form-item label="公司主体">
+                        <n-input
+                            v-model:value="searchParams.shop"
+                            placeholder="请输入公司主体"
+                            clearable
+                            class="page-search-content__item"
+                        />
+                    </n-form-item>
+                    <n-form-item label="支付方式">
+                        <n-input
+                            v-model:value="searchParams.shop"
+                            placeholder="请输入支付方式"
                             clearable
                             class="page-search-content__item"
                         />
@@ -85,6 +103,7 @@
                 :columns="columns"
                 :data="table.data"
                 :max-height="max_height"
+                :scroll-x="max_width"
                 :loading="table.loading"
             />
 
@@ -159,11 +178,7 @@ const columns = [
         title: "序号",
         key: "no",
         width: 60,
-    },
-    {
-        title: "来源",
-        key: "source",
-        width: 100,
+        fixed: 'left',
     },
     {
         title: "流水号",
@@ -171,32 +186,54 @@ const columns = [
         width: 200,
     },
     {
+        title: "来源",
+        key: "source",
+        width: 70,
+    },
+    {
+        title: "公司主体",
+        key: "signcompany",
+        width: 200,
+    },
+    {
         title: "门店名称",
         key: "shop",
+        width: 100,
     },
     {
         title: "楼栋",
-        key: "building"
+        key: "building",
+        width: 80,
     },
     {
         title: "门牌号",
         key: "doorno",
+        width: 100,
     },
     {
         title: "类别",
         key: "category",
+        width: 100,
     },
     {
         title: "标记",
         key: "tag",
+        width: 60,
     },
     {
         title: "实际金额",
         key: "actual_amount",
+        width: 100,
+    },
+    {
+        title: "支付方式",
+        key: "channel",
+        width: 100,
     },
     {
         title: "承租人",
         key: "renter",
+        width: 100,
     },
     {
         title: "交易时间",
@@ -259,10 +296,14 @@ function handleUploadSuccess() {
 }
 
 const max_height = ref(0);
+const max_width = ref(0);
 function getMaxHeight() {
-    let window_height = document.documentElement.clientHeight;
-    window_height = window_height - 60 - 32 - 284;
+    let { clientHeight: window_height, clientWidth: window_width } = document.documentElement;
 
+    window_height = window_height - 60 - 32 - 344;
+    window_width = window_width - 314;
+
+    max_width.value = window_width;
     max_height.value = window_height;
 }
 
@@ -278,9 +319,15 @@ function initSearchParams() {
 </script>
 
 <style lang="scss" scoped>
+.page-search-content__item {
+    flex-shrink: 0;
+    width: 150px;
+}
+.page-search-content {
+    align-items: flex-start !important;
+}
 .page-content {
     margin-top: 0;
-
     .page-title {
         position: relative;
 
