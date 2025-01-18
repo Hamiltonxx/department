@@ -38,7 +38,7 @@
                     <br />
                     <n-form-item label="公司主体">
                         <n-input
-                            v-model:value="searchParams.shop"
+                            v-model:value="searchParams.signcompany"
                             placeholder="请输入公司主体"
                             clearable
                             class="page-search-content__item"
@@ -46,7 +46,7 @@
                     </n-form-item>
                     <n-form-item label="支付方式">
                         <n-input
-                            v-model:value="searchParams.shop"
+                            v-model:value="searchParams.channel"
                             placeholder="请输入支付方式"
                             clearable
                             class="page-search-content__item"
@@ -257,15 +257,14 @@ const table = ref({
 // 获取数据
 async function getData() {
     const {current, size} = table.value;
-    const { date, shop, source } = searchParams.value;
+    const { date, shop, source, signcompany, channel } = searchParams.value;
 
     let params = {
-        shop,
+        shop, signcompany, channel,
         source: source === "全部" ? null : source, 
     };
-    console.log(date);
-    if (date) {
 
+    if (date) {
         params.startdate = formatDate(new Date(date[0])) + ' 00:00:00';
         params.enddate = formatDate(new Date(date[1])) + ' 23:59:59';
     }
@@ -313,6 +312,8 @@ function initSearchParams() {
         date: null,
         shop: null,
         source: "全部",
+        signcompany: null,
+        channel: null,
     };
 }
 
