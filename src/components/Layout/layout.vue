@@ -64,16 +64,21 @@ const finance = ref({
             key: "Result",
             icon: renderIcon(StatsChartOutline),
         },
-        {
-            label: "匹配记录",
-            key: "MatchRecords",
-            icon: renderIcon(DocumentTextOutline),
-        },
-        {
-            label: "凭证记录",
-            key: "ProofRecords",
-            icon: renderIcon(AlbumsOutline),
-        }
+        // {
+        //     label: "支付方式展示",
+        //     key: "PayWay",
+        //     icon: renderIcon(StatsChartOutline),
+        // },
+        // {
+        //     label: "匹配记录",
+        //     key: "MatchRecords",
+        //     icon: renderIcon(DocumentTextOutline),
+        // },
+        // {
+        //     label: "凭证记录",
+        //     key: "ProofRecords",
+        //     icon: renderIcon(AlbumsOutline),
+        // }
     ]
 });
 

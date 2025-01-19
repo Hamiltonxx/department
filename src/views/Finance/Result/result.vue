@@ -52,7 +52,21 @@
 
             <n-tabs
                 type="line"
+                :default-value="activeShowTab"
+                @update:value="handleSelectShowTab"
+            >
+                <n-tab name="1" >
+                    按流水展示
+                </n-tab>
+                <n-tab name="2" >
+                    按支付方式展示
+                </n-tab>
+            </n-tabs>
+
+            <n-tabs
+                type="line"
                 :default-value="activeTab"
+                style="margin-top: 16px"
                 @update:value="handleSelectTab"
             >
                 <n-tab
@@ -69,10 +83,18 @@
             <div class="row">支出：<span>{{ count.expense }}</span> 元</div>
         
             <n-data-table
+                v-if="activeShowTab == '1'"
                 :columns="columns"
                 :data="table.data"
                 :max-height="max_height"
                 :loading="table.loading"
+            />
+
+            <n-data-table
+                v-if="activeShowTab == '2'"
+                :columns="columnsShow"
+                :data="tableShow.data"
+                :loading="tableShow.loading"
             />
         </div>
     </div>
@@ -83,12 +105,14 @@ import { NDataTable, NTabs, NTab, NForm, NFormItem, NDatePicker, NSpace, NButton
 import { ref, onBeforeMount, onMounted } from 'vue';
 import { RefreshOutline, SearchOutline } from '@vicons/ionicons5';
 import { getShop, getShopData, getShopDataDetail } from "@/api/result";
+import { getData } from "@/api/pay-way";
 
 onBeforeMount(() => {
     initSearchParams();
     initShopData();
     initTableCount();
     initTableData();
+    getDataShow();
 });
 
 onMounted(() => {
@@ -101,6 +125,14 @@ const columns = [
     { title: "收入", key: "income", },   
     { title: "支出", key: "expense", },   
     { title: "总计", key: "total", },   
+];
+
+const columnsShow = [
+    { title: "项目", key: "channel" },
+    { title: "收支原因", key: "category" },
+    { title: "收入", key: "income" },
+    { title: "支出", key: "expense" },
+    { title: "总计", key: "total" },
 ];
 
 /**
@@ -234,6 +266,28 @@ function getMaxHeight() {
     max_height.value = window_height;
 }
 
+
+var activeShowTab = ref("1");
+function handleSelectShowTab(tab) {
+    activeShowTab.value = tab;
+}
+
+
+var tableShow = {
+    data: [],
+    loading: false,
+}
+async function getDataShow() {    
+    const params = {
+        ...getParams(),
+        shop: activeTab.value === "全部" ? null : activeTab.value,
+    };
+    const res = await getData(params);
+
+    tableShow.loading = true;
+    tableShow.data = res;
+    tableShow.loading = false;
+}
 </script>
 
 <style scoped lang="scss">
